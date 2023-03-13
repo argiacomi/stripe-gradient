@@ -4,7 +4,7 @@ A reverse engineered, simplified JavaScript library using Three.js & Vite to rep
 
 ## Basic usage
 
-## Install
+### Install
 
 Clone this repo and then in command line type:
 
