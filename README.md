@@ -4,12 +4,13 @@ A reverse engineered, simplified JavaScript library using Three.js & Vite to rep
 
 ## Basic usage
 
-**Install**
+## Install
+
 Clone this repo and then in command line type:
 
 - `npm install` / `yarn install` / `pnpm to install` to install all dependencies
-- `run dev` - run dev-server
-- `run build` - build project from sources
+- `run dev` to run dev-server
+- `run build` to build project from sources
 
 **HTML**
 
