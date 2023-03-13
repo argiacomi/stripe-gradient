@@ -5,7 +5,7 @@ import vertexShader from './shader/vertex.glsl';
 
 let d = 1;
 
-export default class ThreeSketch {
+export default class Gradient {
 	constructor(options) {
 		this.scene = void 0;
 		this.container = options.dom;
@@ -165,7 +165,7 @@ export default class ThreeSketch {
 	}
 
 	addObjects() {
-		let threeSketch = this;
+		let gradient = this;
 		this.initMaterial();
 		this.material = new THREE.ShaderMaterial({
 			extensions: { derivatives: '#extension GL_OES_standard_derivatives : enable' },
@@ -240,6 +240,6 @@ function normalizeColor(hexCode) {
 	// return new THREE.Color(rgbColor[0], rgbColor[1], rgbColor[2]);
 }
 
-new ThreeSketch({
+new Gradient({
 	dom: document.querySelector(`[data-js-controller~=Gradient]`)
 });

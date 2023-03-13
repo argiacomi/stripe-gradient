@@ -37,7 +37,7 @@ Clone this repo and then in command line type:
 **JavaScript**
 
 ```javascript
-new ThreeSketch({
+new Gradient({
 	dom: document.querySelector(`[data-js-controller~=Gradient]`)
 });
 ```
