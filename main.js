@@ -31,8 +31,6 @@ export default class Gradient {
     // this.quadCount = this.xSegCount * this.ySegCount * 2;
     // this.vertexCount = (this.xSegCount + 1) * (this.ySegCount + 1);
     // this.sectionColors = initGradientColors(this.container);
-    //
-
     // this.a = new THREE.Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     // this.m = new THREE.Matrix4(2 / this.width, 0, 0, 0, 0, 2 / this.height, 0, 0, 0, 0, 2 / (-2e3 - 2e3, 0, 0, 0, 0, 1);
 
@@ -71,21 +69,6 @@ export default class Gradient {
     this.camera.aspect = this.width / this.height;
     this.xSegCount = Math.ceil(this.width * 0.06);
     this.ySegCount = Math.ceil(this.height * 0.16);
-
-    // this.imageAspect = 16 / 9;
-    // let a1, a2;
-    // if (this.height / this.width > this.imageAspect) {
-    // 	a1 = (this.width / this.height) * this.imageAspect;
-    // 	a2 = 1;
-    // } else {
-    // 	a1 = 1;
-    // 	a2 = (this.height / this.width) * this.imageAspect;
-    // }
-
-    // this.material.uniforms.resolution.value.x = this.width;
-    // this.material.uniforms.resolution.value.y = this.height;
-    // this.material.uniforms.resolution.value.z = this.a1;
-    // this.material.uniforms.resolution.value.w = this.a2;
 
     this.camera.updateProjectionMatrix();
   }
@@ -237,7 +220,6 @@ function initGradientColors(canvas) {
 
 function normalizeColor(hexCode) {
   return [((hexCode >> 16) & 255) / 255, ((hexCode >> 8) & 255) / 255, (255 & hexCode) / 255];
-  // return new THREE.Color(rgbColor[0], rgbColor[1], rgbColor[2]);
 }
 
 new Gradient({
