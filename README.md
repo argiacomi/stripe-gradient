@@ -1,6 +1,6 @@
 # Stripe Gradient
 
-A reverse engineered, simplified JavaScript library using Three.js & Vite to replicate the animated [Stripe](https://stripe.com/) gradients.
+A reverse engineered JavaScript library using Three.js & Vite to replicate the animated [Stripe](https://stripe.com/) gradients.
 
 ## Basic usage
 
@@ -22,15 +22,15 @@ Clone this repo and then in command line type:
 
 ```css
 .gradient-canvas {
-	margin: 0;
-	padding: 0;
-	display: block;
-	width: 100%;
-	height: 100%;
-	--gradientColorZero: #a960ee;
-	--gradientColorOne: #ff333d;
-	--gradientColorTwo: #90e0ff;
-	--gradientColorThree: #ffcb57;
+  margin: 0;
+  padding: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  --gradientColorZero: #a960ee;
+  --gradientColorOne: #ff333d;
+  --gradientColorTwo: #90e0ff;
+  --gradientColorThree: #ffcb57;
 }
 ```
 
@@ -38,6 +38,6 @@ Clone this repo and then in command line type:
 
 ```javascript
 new Gradient({
-	dom: document.querySelector(`[data-js-controller~=Gradient]`)
+  dom: document.querySelector(`[data-js-controller~=Gradient]`)
 });
 ```
