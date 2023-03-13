@@ -3,8 +3,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import fragmentShader from './shader/fragment.glsl';
 import vertexShader from './shader/vertex.glsl';
 
-let d = 1;
-
 export default class Gradient {
   constructor(options) {
     this.scene = void 0;
@@ -26,17 +24,38 @@ export default class Gradient {
     this.freqX = 14e-5;
     this.freqY = 29e-5;
     this.sectionColors = initGradientColors(this.container);
-
     // this.count = 0;
     // this.quadCount = this.xSegCount * this.ySegCount * 2;
     // this.vertexCount = (this.xSegCount + 1) * (this.ySegCount + 1);
     // this.sectionColors = initGradientColors(this.container);
     // this.a = new THREE.Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
     // this.m = new THREE.Matrix4(2 / this.width, 0, 0, 0, 0, 2 / this.height, 0, 0, 0, 0, 2 / (-2e3 - 2e3, 0, 0, 0, 0, 1);
+    function initGradientColors(canvas) {
+      let computedCanvasStyle = getComputedStyle(canvas);
+      let sectionColors = ['--gradientColorZero', '--gradientColorOne', '--gradientColorTwo', '--gradientColorThree']
+        .map((color) => {
+          let hex = computedCanvasStyle.getPropertyValue(color).trim();
+          if (4 === hex.length) {
+            const hexTemp = hex
+              .substr(1)
+              .split('')
+              .map((hexTemp) => hexTemp + hexTemp)
+              .join('');
+            hex = hexTemp;
+          }
+          return '0x' + hex.substring(1);
+        })
+        .filter(Boolean)
+        .map(normalizeColor);
+      return sectionColors;
+    }
+
+    function normalizeColor(hexCode) {
+      return [((hexCode >> 16) & 255) / 255, ((hexCode >> 8) & 255) / 255, (255 & hexCode) / 255];
+    }
 
     this.init();
     this.addObjects();
-
     this.resize();
     this.render();
     this.setupResize();
@@ -186,40 +205,11 @@ export default class Gradient {
 
   render(e) {
     if (!this.isPlaying) return;
-    if (!e) {
-      e = 160;
-    }
-    if (((this.t += Math.min(e - this.last, 1e3 / 15)), (this.last = e))) {
-      let e = 160;
-      (e = -160), (this.t += e);
-    }
+    this.t += 0.05;
     this.material.uniforms.u_time.value = this.t;
     requestAnimationFrame(this.render.bind(this));
     this.renderer.render(this.scene, this.camera);
   }
-}
-function initGradientColors(canvas) {
-  let computedCanvasStyle = getComputedStyle(canvas);
-  let sectionColors = ['--gradientColorZero', '--gradientColorOne', '--gradientColorTwo', '--gradientColorThree']
-    .map((color) => {
-      let hex = computedCanvasStyle.getPropertyValue(color).trim();
-      if (4 === hex.length) {
-        const hexTemp = hex
-          .substr(1)
-          .split('')
-          .map((hexTemp) => hexTemp + hexTemp)
-          .join('');
-        hex = hexTemp;
-      }
-      return '0x' + hex.substring(1);
-    })
-    .filter(Boolean)
-    .map(normalizeColor);
-  return sectionColors;
-}
-
-function normalizeColor(hexCode) {
-  return [((hexCode >> 16) & 255) / 255, ((hexCode >> 8) & 255) / 255, (255 & hexCode) / 255];
 }
 
 new Gradient({

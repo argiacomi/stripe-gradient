@@ -33,7 +33,7 @@ void main() {
   float time = u_time * u_global.noiseSpeed;
   vec2 noiseCoord = resolution * normal.xy * u_global.noiseFreq;
   // Vertex noise
-  float noise = snoise(vec3(uv, u_time * 5e-6)) ;
+  float noise = snoise(vec3(uv, u_time * 0.01)) ;
   vec3 pos = vec3(position.x,position.y,position.z + noise * 0.5);
 
   v_color = vec3(u_baseColor);
