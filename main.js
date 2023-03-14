@@ -1,37 +1,35 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import fragmentShader from './shader/fragment.glsl';
 import vertexShader from './shader/vertex.glsl';
+import './style.css';
 
 let count = 1;
 export default class Gradient {
   constructor(options) {
     this.conf = {
-      wireframe: true,
-      density: [0.06, 0.16],
-      playing: true
+      wireframe: false,
+      playing: true,
+      density: [0.6, 0.16],
+      darkenTop: false,
+      activeColors: [1, 1, 1, 1],
+      noiseFreq: [14e-4, 29e-4],
+      noiseSpeed: 8.33,
+      angle: 0,
+      amp: 320,
+      seed: 5
     };
     this.scene = void 0;
     this.container = options.dom;
+    this.sectionColors = initGradientColors(this.container);
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
     this.xSegCount = Math.ceil(this.width * this.conf.density[0]);
     this.ySegCount = Math.ceil(this.height * this.conf.density[1]);
     this.renderer = void 0;
     this.camera = void 0;
-    this.controls = void 0;
     this.uniforms = void 0;
-    this.t = 1253106.0;
+    this.t = 1253166;
     this.last = 0.0;
-    this.angle = 0.0;
-    this.freqX = 14e-5;
-    this.freqY = 29e-5;
-    this.sectionColors = initGradientColors(this.container);
-    this.m = new THREE.Matrix4(2 / this.width, 0, 0, 0, 0, 2 / this.height, 0, 0, 0, 0, 2 / (-2e3 - 2e3, 0, 0, 0, 0, 1));
-
-    // this.quadCount = this.xSegCount * this.ySegCount * 2;
-    // this.vertexCount = (this.xSegCount + 1) * (this.ySegCount + 1);
-    // this.a = new THREE.Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
     function initGradientColors(canvas) {
       let computedCanvasStyle = getComputedStyle(canvas);
@@ -46,15 +44,11 @@ export default class Gradient {
               .join('');
             hex = hexTemp;
           }
-          return '0x' + hex.substring(1);
+          return hex;
         })
         .filter(Boolean)
-        .map(normalizeColor);
+        .map((color) => new THREE.Color(color));
       return sectionColors;
-    }
-
-    function normalizeColor(hexCode) {
-      return [((hexCode >> 16) & 255) / 255, ((hexCode >> 8) & 255) / 255, (255 & hexCode) / 255];
     }
 
     this.init();
@@ -73,17 +67,9 @@ export default class Gradient {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(this.width, this.height);
     this.renderer.setClearColor(0xeeeeee, 1);
-    this.renderer.outputEncoding = THREE.sRGBEncoding;
 
-    // this.camera = new THREE.OrthographicCamera(this.width / -2, this.width / 2, this.height / 2, this.height / -2, 1, 1000);
-    // this.camera.projectionMatrix = this.m;
-    // console.log(this.camera);
-    // console.log(this.m);
-
-    this.camera = new THREE.PerspectiveCamera(70, this.width / this.height, 0.001, 1000);
-    this.camera.position.set(0, 0, 1);
-    this.camera.projectionMatrix = this.m;
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.camera = new THREE.OrthographicCamera();
+    this.camera.projectionMatrix.fromArray([2 / this.width, 0, 0, 0, 0, 2 / this.height, 0, 0, 0, 0, 2 / (-2e3 - 2e3), 0, 0, 0, 0, 1]);
   }
 
   setupWindowResize() {
@@ -97,45 +83,54 @@ export default class Gradient {
     this.ySegCount = Math.ceil(this.height * 0.16);
 
     this.camera.aspect = this.width / this.height;
-    this.camera.updateProjectionMatrix();
+
     this.renderer.setSize(this.width, this.height);
   }
 
   initMaterial() {
-    function waveLayers(sectionColors) {
-      let u_waveLayers = {
-        value: []
-      };
-      for (let i = 1; i < sectionColors.length; i += 1) {
-        u_waveLayers.value.push({
-          value: {
-            color: { value: sectionColors[i] },
-            noiseFreq: { value: new THREE.Vector2(2.0 + i / sectionColors.length, 3.0 + i / sectionColors.length) },
-            noiseSpeed: { value: 11.0 + 0.3 * i },
-            noiseFlow: { value: 6.5 + 0.3 * i },
-            noiseSeed: { value: 5.0 + 10.0 * i },
-            noiseFloor: { value: 0.1 },
-            noiseCeil: { value: 0.63 + 0.07 * i }
-          }
-        });
-      }
-      return u_waveLayers;
-    }
     this.uniforms = {
+      aspectRatio: { value: this.camera.aspect },
+      resolution: { value: [this.width, this.length] },
       u_time: { value: 0 },
-      u_baseColor: { value: this.sectionColors[0] },
-      u_globalNoiseFreq: { value: new THREE.Vector2(this.freqX, this.freqY) },
-      u_globalNoiseSpeed: { value: 5e-6 },
-      u_resolution: { value: new THREE.Vector2(this.width, this.height) },
-      u_vertDeformNoiseAmp: { value: 320.0 },
-      u_vertDeformNoiseFlow: { value: 3.0 },
-      u_vertDeformNoiseFreq: { value: new THREE.Vector2(3.0, 4.0) },
-      u_vertDeformIncline: { value: Math.sin(this.angle) / Math.cos(this.angle) },
-      u_vertDeformNoiseSeed: { value: 5.0 },
-      u_vertDeformNoiseSpeed: { value: 10.0 },
-      u_vertDeformOffsetBottom: { value: -0.5 },
-      u_vertDeformOffsetTop: { value: -0.5 }
+      u_shadow_power: { value: this.width < 600 ? 5 : 6 },
+      u_darken_top: { value: '' === this.conf.darkenTop ? 1 : 0 },
+      u_active_colors: { value: this.conf.activeColors },
+      u_global: {
+        value: {
+          noiseFreq: this.conf.noiseFreq,
+          noiseSpeed: 5e-6
+        }
+      },
+      u_vertDeform: {
+        value: {
+          incline: Math.sin(this.conf.angle) / Math.cos(this.conf.angle),
+          offsetTop: -0.25,
+          offsetBottom: -0.25,
+          noiseFreq: [3, 4],
+          noiseAmp: this.conf.amp,
+          noiseSpeed: 10,
+          noiseFlow: 3,
+          noiseSeed: this.conf.seed
+        }
+      },
+      u_baseColor: {
+        value: this.sectionColors[0]
+      },
+      u_waveLayers: {
+        value: []
+      }
     };
+    for (let i = 1; i < this.sectionColors.length; i += 1) {
+      this.uniforms.u_waveLayers.value.push({
+        color: this.sectionColors[i],
+        noiseFreq: new THREE.Vector2(2 + i / this.sectionColors.length, 3 + i / this.sectionColors.length),
+        noiseSpeed: 11 + 0.3 * i,
+        noiseFlow: 6.5 + 0.3 * i,
+        noiseSeed: this.conf.seed + 10 * i,
+        noiseFloor: 0.1,
+        noiseCeil: 0.63 + 0.07 * i
+      });
+    }
   }
 
   addObjects() {
@@ -148,19 +143,11 @@ export default class Gradient {
       fragmentShader: fragmentShader
     });
 
-    // geometry = new THREE.PlaneGeometry(width, height, xSegCount, ySegCount);
-    this.geometry = new THREE.PlaneGeometry(1, 1, this.xSegCount, this.ySegCount);
+    this.geometry = new THREE.PlaneGeometry(this.width, this.height, this.xSegCount, this.ySegCount);
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
 
     this.scene.add(this.mesh);
-  }
-
-  addLights() {
-    const light1 = new THREE.AmbientLight(0xffffff, 0.5);
-    const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
-    light2.position.set(0.5, 0, 0.866);
-    this.scene.add(light1, light2);
   }
 
   stop() {
@@ -174,19 +161,17 @@ export default class Gradient {
   }
 
   render(e) {
-    if (this.conf.playing) {
-      if (e) {
-        this.t += Math.min(e - this.last, 1e3 / 15);
-        this.last = e;
+    if (this.conf.playing && e !== void 0) {
+      if (!(parseInt(e, 10) % 2 == 0)) {
+        this.t += this.conf.noiseSpeed;
+        this.renderer.render(this.scene, this.camera);
+      } else {
+        this.t += this.conf.noiseSpeed;
         this.mesh.material.uniforms.u_time.value = this.t;
         this.renderer.render(this.scene, this.camera);
-
-        if (0 !== this.last) {
-          this.renderer.render(this.scene, this.camera);
-        }
       }
-      requestAnimationFrame(this.render.bind(this));
     }
+    requestAnimationFrame(this.render.bind(this));
   }
 }
 
