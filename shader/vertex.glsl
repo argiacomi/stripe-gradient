@@ -1,4 +1,5 @@
 precision highp float;
+attribute vec2 uvNorm;
 
 uniform float aspectRatio;
 uniform vec2 resolution;
@@ -46,16 +47,14 @@ varying vec3 v_color;
 void main() {
 
   float time = u_time * u_global.noiseSpeed;
-  vec2 noiseCoord = uv;
-  vec2 st = 1. - uv.xy;
+  vec2 noiseCoord = resolution * uvNorm * u_global.noiseFreq;
 
+  vec2 st = 1. - uvNorm.xy;
 
-  // Front-to-back tilt
-  float tilt = uv.y / 2.0;
-  // Left-to-right angle
-  float incline = uv.x / 2.0 * u_vertDeform.incline;
-  // Up-down shift to offset incline
-  float offset = 0.5 * u_vertDeform.incline * mix(u_vertDeform.offsetBottom, u_vertDeform.offsetTop, uv.y);
+  // Tilt
+  float tilt = resolution.y / 2.0 * uvNorm.y;
+  float incline = resolution.x * uvNorm.x / 2.0 * u_vertDeform.incline;
+  float offset = resolution.x / 2.0 * u_vertDeform.incline * mix(u_vertDeform.offsetBottom, u_vertDeform.offsetTop, uv.y);
 
   // Vertex noise
   float noise = snoise(vec3(
@@ -65,7 +64,7 @@ void main() {
   )) * u_vertDeform.noiseAmp;
 
   // Fade noise to zero at edges
-  noise *= 1.0 - pow(abs(uv.y), 2.0);
+  noise *= 1.0 - pow(abs(uvNorm.y), 2.0);
 
   // Clamp to 0
   noise = max(0.0, noise);

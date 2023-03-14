@@ -1,11 +1,495 @@
-.gradient-canvas {
+html {
+  --gutterWidth: 16px;
+  --scrollbarWidth: 0px;
+  --windowWidth: calc(100vw - var(--scrollbarWidth));
+  --layoutWidth: calc(var(--windowWidth) - var(--gutterWidth) * 2);
+  --layoutWidthMax: 1080px;
+  --viewportWidthSmall: 375;
+  --viewportWidthMedium: 600;
+  --viewportWidthLarge: 1112;
+  --viewportScale: calc(var(--windowWidth) / var(--viewportWidthLarge));
+  --paddingTop: 160px;
+  --paddingBottom: 160px;
+  --columnPaddingNone: 0;
+  --columnPaddingSmall: 8px;
+  --columnPaddingNormal: 16px;
+  --columnPaddingMedium: 16px;
+  --columnPaddingLarge: 16px;
+  --columnPaddingXLarge: 16px;
+  --rowGapNormal: 8px;
+  --rowGapMedium: 24px;
+  --rowGapLarge: 32px;
+  --rowGapXLarge: 64px;
+  --rowGapXXLarge: 88px;
+  --rowGap: var(--rowGapNormal);
+  --columnCountMax: 1;
+  --columnWidth: calc(var(--layoutWidth) / var(--columnCountMax));
+  --columnMaxWidth: calc(var(--layoutWidthMax) * 0.25);
+  --copyMaxWidth: calc(var(--columnMaxWidth) * 3);
+}
+@media (min-width: 600px) {
+  html {
+    --columnPaddingMedium: 32px;
+    --columnPaddingLarge: 64px;
+    --columnPaddingXLarge: 64px;
+    --columnCountMax: 2;
+  }
+}
+@media (min-width: 900px) {
+  html {
+    --columnPaddingXLarge: 112px;
+    --columnCountMax: 4;
+  }
+}
+@media (min-width: 1112px) {
+  html {
+    --layoutWidth: var(--layoutWidthMax);
+    --gutterWidth: calc(var(--windowWidth) / 2 - var(--layoutWidth) / 2);
+  }
+}
+
+.PgRoot {
+  --fontFamily: 'sohne-var', 'Helvetica Neue', 'Arial', sans-serif;
+  --fontWeightLight: 200;
+  --fontWeightNormal: 300;
+  --fontWeightSemibold: 425;
+  --fontWeightBold: 500;
+  --systemFontFamily: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --codeFontFamily: 'SourceCodePro';
+  --sourceCodeFont: 500 14px/1.714285714 var(--codeFontFamily);
+  --ctaFont: var(--fontWeightSemibold) 15px/1.6 var(--fontFamily);
+  --inputFont: var(--fontWeightNormal) 15px/1.6 var(--fontFamily);
+  --cardShadowXSmall: 0 2px 5px -1px rgba(50, 50, 93, 0.25), 0 1px 3px -1px rgba(0, 0, 0, 0.3);
+  --cardShadowSmall: 0 6px 12px -2px rgba(50, 50, 93, 0.25), 0 3px 7px -3px rgba(0, 0, 0, 0.3);
+  --cardShadowMedium: 0 13px 27px -5px rgba(50, 50, 93, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.3);
+  --cardShadowLarge: 0 30px 60px -12px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3);
+  --cardShadowLargeInset: inset 0 30px 60px -12px rgba(50, 50, 93, 0.25), inset 0 18px 36px -18px rgba(0, 0, 0, 0.3);
+  --cardShadowXLarge: 0 50px 100px -20px rgba(50, 50, 93, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3);
+  --cardShadowXSMallMargin: 2px;
+  --cardShadowSmallMargin: 8px;
+  --cardShadowMediumMargin: 16px;
+  --cardShadowLargeMargin: 32px;
+  --cardShadowXLargeMargin: 48px;
+  --cardBorderRadius: 8px;
+  --filterShadowMedium: 0px 3px 11.5px -3.5px rgba(50, 50, 93, 0.25), 0px 3.8px 7.5px -3.7px rgba(0, 0, 0, 0.1);
+  --scrollbarOffset: 10px;
+  --angleNormal: -6deg;
+  --angleStrong: -12deg;
+  --angleNormalSin: 0.106;
+  --angleStrongSin: 0.212;
+  --modalZIndex: 999999;
+  --fixedNavHeight: 60px;
+  --fixedNavSpacing: 48px;
+  --fixedNavScrollMargin: calc(var(--fixedNavHeight) + var(--fixedNavSpacing));
+  --hoverTransition: 150ms cubic-bezier(0.215, 0.61, 0.355, 1);
+  --focusBoxShadow: 0 0 0 2px #4d90fe, inset 0 0 0 2px hsla(0, 0%, 100%, 0.9);
+  color-scheme: only light;
+}
+.PgRoot *,
+.PgRoot :after,
+.PgRoot :before {
+  box-sizing: border-box;
+}
+@media (prefers-reduced-motion: reduce) {
+  .PgRoot {
+    --hoverTransition: none;
+  }
+}
+.PgRoot[lang^='ja'] {
+  --fontWeightNormal: 300;
+  --fontWeightSemibold: 300;
+}
+.PgRoot[lang^='th'] {
+  --fontWeightSemibold: 600;
+  --fontWeightBold: 600;
+}
+.PgRoot[lang^='zh-cn'] {
+  --fontWeightNormal: 400;
+  --fontWeightSemibold: 500;
+}
+.PgRoot[data-loading] {
+  overflow-x: hidden;
+}
+.PgRoot[data-loading] :after,
+.PgRoot[data-loading] :before,
+.PgRoot[data-loading] :not([data-transition-in]) {
+  transition: none !important;
+}
+
+blockquote,
+figure,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+pre {
   margin: 0;
-  padding: 0;
-  display: block;
+}
+a {
+  text-decoration: none;
+}
+strong {
+  font-weight: var(--fontWeightBold);
+}
+
+body {
+  margin: 0;
+  font-family: var(--fontFamily);
+  font-weight: var(--fontWeightNormal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--textColor);
+  background: var(--backgroundColor);
+}
+
+.Section {
+  --sectionAngleSin: var(--angleNormalSin);
+  --sectionAngle: 0;
+  --sectionPaddingNormalMax: 128;
+  --sectionPaddingSmallMax: 110;
+  --sectionPaddingXSmallMax: 72;
+  --sectionPaddingMin: 72;
+  --sectionPaddingMax: var(--sectionPaddingNormalMax);
+  --sectionPaddingTopMax: var(--sectionPaddingMax);
+  --sectionPaddingBottomMax: var(--sectionPaddingMax);
+  --sectionMarginBottom: 0;
+  --sectionAngleHeight: calc(var(--windowWidth) * var(--sectionAngleSin));
+  --sectionAnglePaddingBaseMin: 100;
+  --sectionAnglePaddingBaseMax: var(--sectionPaddingMax);
+  --sectionAnglePaddingTopBaseMax: var(--sectionAnglePaddingBaseMax);
+  --sectionAnglePaddingBottomBaseMax: var(--sectionAnglePaddingBaseMax);
+  --sectionAngleMaxHeight: none;
+  --sectionOverflow: hidden;
+  --sectionTransformOrigin: 100% 0;
+  --sectionBackgroundOverflow: visible;
+  position: relative;
+  z-index: 1;
+  margin-bottom: var(--sectionMarginBottom);
+  color: var(--textColor);
+  scroll-margin-top: calc(var(--fixedNavHeight) + var(--fixedNavSpacing) - var(--sectionPaddingTop));
+}
+
+.Section {
+  --sectionAnglePaddingTopBase: calc(var(--sectionAnglePaddingBaseMin) * 1px + (var(--sectionAnglePaddingTopBaseMax) - var(--sectionAnglePaddingBaseMin)) * (var(--windowWidth) / 737 - 0.50882px));
+  --sectionAnglePaddingBottomBase: calc(
+    var(--sectionAnglePaddingBaseMin) * 1px + (var(--sectionAnglePaddingBottomBaseMax) - var(--sectionAnglePaddingBaseMin)) * (var(--windowWidth) / 737 - 0.50882px)
+  );
+  --sectionPaddingTopGutterWidth: var(--gutterWidth);
+  --sectionAnglePaddingTop: calc(var(--sectionAngleHeight) - var(--sectionAngleSin) * var(--sectionPaddingTopGutterWidth) + var(--sectionAnglePaddingTopBase));
+  --sectionAnglePaddingBottom: calc(var(--sectionAngleHeight) - var(--sectionAngleSin) * var(--gutterWidth) + var(--sectionAnglePaddingBottomBase));
+  --sectionPaddingTop: calc(var(--sectionPaddingMin) * 1px + (var(--sectionPaddingTopMax) - var(--sectionPaddingMin)) * (var(--windowWidth) / 737 - 0.50882px));
+  --sectionPaddingBottom: calc(var(--sectionPaddingMin) * 1px + (var(--sectionPaddingBottomMax) - var(--sectionPaddingMin)) * (var(--windowWidth) / 737 - 0.50882px));
+}
+
+@media (max-width: 375px) {
+  .Section {
+    --sectionAnglePaddingTopBase: calc(var(--sectionAnglePaddingBaseMin) * 1px);
+    --sectionAnglePaddingBottomBase: calc(var(--sectionAnglePaddingBaseMin) * 1px);
+    --sectionPaddingTop: calc(var(--sectionPaddingMin) * 1px);
+    --sectionPaddingBottom: calc(var(--sectionPaddingMin) * 1px);
+  }
+}
+
+@media (min-width: 1112px) {
+  .Section {
+    --sectionAnglePaddingTopBase: calc(var(--sectionAnglePaddingTopBaseMax) * 1px);
+    --sectionAnglePaddingBottomBase: calc(var(--sectionAnglePaddingBottomBaseMax) * 1px);
+    --sectionPaddingTop: calc(var(--sectionPaddingTopMax) * 1px);
+    --sectionPaddingBottom: calc(var(--sectionPaddingBottomMax) * 1px);
+  }
+}
+
+.Section__masked {
+  overflow: var(--sectionOverflow);
+}
+.Section__container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  min-height: var(--sectionMinHeight);
+}
+.Section__layoutContainer {
   width: 100%;
-  height: 100%;
+  max-width: var(--layoutWidth);
+  margin: 0 var(--columnPaddingNormal);
+}
+.Section__layout {
+  padding: var(--sectionPaddingTop) 0 var(--sectionPaddingBottom);
+}
+
+.ColumnLayout {
+  --columnRowGap: var(--rowGapLarge);
+  display: grid;
+  row-gap: var(--columnRowGap);
+  align-items: flex-start;
+}
+
+@media (min-width: 600px) {
+  .ColumnLayout[data-columns='1,1,1'],
+  .ColumnLayout[data-columns='1,1,1,1'],
+  .ColumnLayout[data-columns='2,1'],
+  .ColumnLayout[data-columns='2,1,0'],
+  .ColumnLayout[data-columns='2,1,1'],
+  .ColumnLayout[data-columns='2,2'],
+  .ColumnLayout[data-columns='3,2'] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 599px) {
+  .ColumnLayout[data-columns='2,2'].ColumnLayout--reflowDirectionRightToLeft > :first-child {
+    order: 1;
+  }
+}
+@media (max-width: 899px) {
+  .ColumnLayout[data-columns='1,3']:not(.ColumnLayout--reflowDirectionLeftToRight) > :first-child,
+  .ColumnLayout[data-columns='3,1'].ColumnLayout--reflowDirectionRightToLeft > :first-child,
+  .ColumnLayout[data-columns='3,2'].ColumnLayout--reflowDirectionRightToLeft > :first-child {
+    order: 1;
+  }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+  .ColumnLayout[data-columns-tablet='1'] {
+    grid-template-columns: 1fr;
+  }
+  .ColumnLayout[data-columns='2,1,1'] > :first-child {
+    grid-area: 1 / span 2;
+  }
+}
+@media (min-width: 900px) {
+  .ColumnLayout[data-columns='1,1,1'] {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .ColumnLayout[data-columns='2,1'] {
+    grid-template-columns: 2fr 1fr;
+  }
+  .ColumnLayout[data-columns='1,1,1,1'] {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .ColumnLayout[data-columns='1,1'] {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ColumnLayout[data-columns='1,3'] {
+    grid-template-columns: 1fr minmax(0, 3fr);
+  }
+  .ColumnLayout[data-columns='3,1'] {
+    grid-template-columns: 3fr 1fr;
+  }
+  .ColumnLayout[data-columns='2,1,1'] {
+    grid-template-columns: 2fr repeat(2, 1fr);
+  }
+  .ColumnLayout[data-columns='2,1,0'] {
+    grid-template-columns: 2fr 1fr 1fr;
+  }
+  .ColumnLayout[data-columns='1,2,1'] {
+    grid-template-columns: 1fr 2fr 1fr;
+  }
+}
+@media (min-width: 1112px) {
+  .ColumnLayout[data-columns='3,2'] {
+    grid-template-columns: 3fr 2fr;
+    min-width: calc(var(--columnWidth) * 5);
+  }
+}
+
+.Copy {
+  --paddingLeft: var(--columnPaddingNormal);
+  --paddingRight: var(--columnPaddingMedium);
+  --headerPaddingLeft: var(--paddingLeft);
+  --headerPaddingRight: var(--paddingRight);
+  --headerMaxWidth: var(--copyMaxWidth);
+  --bodyPaddingLeft: var(--paddingLeft);
+  --bodyPaddingRight: var(--paddingRight);
+  --bodyMaxWidth: var(--copyMaxWidth);
+  --footerPaddingLeft: var(--paddingLeft);
+  --footerPaddingRight: var(--paddingLeft);
+  --footerRowGap: var(--rowGapMedium);
+  --ctaSpacing: 16px;
+  --footerGap: '';
+  scroll-margin-top: var(--fixedNavScrollMargin);
+}
+
+.Copy {
+  --titleFont: var(--titleWeight) var(--titleFontSize) / var(--titleLineHeight) var(--fontFamily);
+  --captionFont: var(--fontWeightBold) var(--captionFontSize, 18px) / var(--captionLineHeight, 1.555555556) var(--fontFamily);
+  --bodyFont: var(--fontWeightNormal) var(--bodyFontSize, 18px) / var(--bodyLineHeight, 1.555555556) var(--fontFamily);
+  letter-spacing: 0.2px;
+}
+.Copy,
+.Copy__header {
+  display: grid;
+  row-gap: var(--rowGap);
+}
+
+.Copy__body.variant--Detail {
+  --bodyFont: var(--fontWeightNormal) 15px/1.6 var(--fontFamily);
+}
+.Copy__body {
+  padding: 0 var(--bodyPaddingRight) 0 var(--bodyPaddingLeft);
+  font: var(--bodyFont);
+  color: var(--textColor);
+  max-width: var(--bodyMaxWidth);
+}
+.Copy__body p + p {
+  margin-top: var(--paragraphGap);
+}
+
+.HomepageHero.Section {
+  --sectionPaddingTopMax: 116;
+}
+@media (max-width: 899px) {
+  .HomepageHero.Section {
+    --sectionPaddingBottomMax: calc(var(--sectionPaddingNormalMax) + 40);
+  }
+}
+
+.HomepageHeroHeader {
+  --titleFontMin: 50;
+  --titleFontMax: 78;
+  --viewportMin: var(--viewportWidthSmall);
+  --viewportMax: var(--viewportWidthMedium);
+  --titleFontSize: calc(var(--titleFontMin) * 1px + (var(--titleFontMax) - var(--titleFontMin)) * (var(--windowWidth) - var(--viewportMin) * 1px) / (var(--viewportMax) - var(--viewportMin)));
+  --titleLineHeight: 1.04;
+  --titleLetterSpacing: -0.04em;
+  --titleWeight: var(--fontWeightBold);
+  --titleFont: var(--titleWeight) var(--titleFontSize) / var(--titleLineHeight) var(--fontFamily);
+  --headerMarginTop: 100px;
+  --headerPadding: 0 var(--headerPaddingRight) 0 var(--headerPaddingLeft);
+  --captionHeight: 25px;
+  --captionTitleGap: 48px;
+  --captionMarginTop: calc(var(--headerMarginTop) - var(--captionHeight) - var(--captionTitleGap));
+  position: relative;
+  min-width: 0;
+  padding: var(--headerPadding);
+}
+
+@media (min-width: 600px) {
+  .HomepageHeroHeader {
+    --headerPaddingRight: var(--columnPaddingNone);
+    --titleFontMin: 60;
+    --titleFontMax: 94;
+    --viewportMin: var(--viewportWidthMedium);
+    --viewportMax: var(--viewportWidthLarge);
+  }
+}
+@media (min-width: 1112px) {
+  .HomepageHeroHeader {
+    --titleFontSize: 94px;
+  }
+}
+
+.HomepageHeroHeader__title {
+  margin-top: var(--headerMarginTop);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  font: var(--titleFont);
+  color: #212121;
+  letter-spacing: var(--titleLetterSpacing, inherit);
+}
+.HomepageHeroHeader--hasCaption.HomepageHeroHeader__title {
+  margin-top: var(--captionTitleGap);
+}
+@media (min-width: 600px) {
+  .HomepageHeroHeader__title {
+    min-width: calc(100% + 100px);
+    min-height: 200px;
+  }
+}
+
+.HomepageHeroHeader__title--overlay {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: var(--headerPadding);
+  z-index: 2;
+  color: #212121;
+}
+
+.HomepageHeroGradient {
   --gradientColorZero: #a960ee;
   --gradientColorOne: #ff333d;
   --gradientColorTwo: #90e0ff;
   --gradientColorThree: #ffcb57;
+  --gradientColorZeroTransparent: rgba(169, 96, 238, 0);
+  --gradientColorOneTransparent: rgba(255, 51, 61, 0);
+  --gradientColorTwoTransparent: rgba(144, 224, 255, 0);
+  --gradientColorThreeTransparent: rgba(255, 203, 87, 0);
+  --gradientAngle: var(--angleStrong);
+  --gradientHeight: calc(100% + var(--sectionPaddingTop) + var(--transformOriginX) * var(--sectionAngleSin));
+  --offsetX: var(--gutterWidth);
+  --transformOriginX: -60px;
+  --sectionAngleSin: var(--angleStrongSin);
+  position: absolute;
+  bottom: 0;
+  top: auto;
+  left: calc(var(--offsetX) * -1);
+  width: var(--windowWidth);
+  height: var(--gradientHeight);
+  transform-origin: var(--transformOriginX) 100%;
+  transform: skewY(var(--gradientAngle));
+  overflow: hidden;
+  border: none;
+}
+@media (min-width: 600px) {
+  .HomepageHeroGradient {
+    --transformOriginX: calc(var(--gutterWidth) * 0.8);
+  }
+}
+
+.Gradient {
+  overflow: hidden;
+}
+.gradient-canvas {
+  position: relative;
+  display: block;
+  width: inherit;
+  height: 100%;
+  opacity: 0;
+}
+.gradient-canvas.isLoaded {
+  opacity: 1;
+  transition: opacity 1.8s ease-in 50ms;
+}
+
+.Gradient:after {
+  content: '';
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 1000px;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(var(--gradientColorZero) 40%, var(--gradientColorTwoTransparent) 60%) -620px -180px no-repeat,
+    radial-gradient(var(--gradientColorThree) 33%, var(--gradientColorThreeTransparent) 67%) -120px -24px no-repeat,
+    radial-gradient(var(--gradientColorTwo) 40%, var(--gradientColorTwoTransparent) 70%) -470px 150px no-repeat, var(--gradientColorZero);
+}
+@media (min-width: 600px) {
+  .Gradient:after {
+    background: radial-gradient(var(--gradientColorZero) 40%, var(--gradientColorTwoTransparent) 60%) -420px -180px no-repeat,
+      radial-gradient(var(--gradientColorThree) 23%, var(--gradientColorThreeTransparent) 70%) 240px -24px no-repeat,
+      radial-gradient(var(--gradientColorTwo) 30%, var(--gradientColorTwoTransparent) 70%) -270px 220px no-repeat, var(--gradientColorZero);
+  }
+}
+@media (min-width: 900px) {
+  .Gradient:after {
+    background: radial-gradient(var(--gradientColorThree) 23%, var(--gradientColorThreeTransparent) 67% 100%) 385px -24px,
+      radial-gradient(var(--gradientColorOne) 0, var(--gradientColorOneTransparent) 60% 100%) -940px 290px,
+      radial-gradient(var(--gradientColorTwo) 10%, var(--gradientColorTwoTransparent) 60% 100%) -120px 250px,
+      radial-gradient(var(--gradientColorOne) 40%, var(--gradientColorOneTransparent) 57% 100%) 495px -44px,
+      radial-gradient(var(--gradientColorZero) 30%, var(--gradientColorZeroTransparent) 67% 100%) 122px -120px,
+      radial-gradient(var(--gradientColorZero) 10%, var(--gradientColorZeroTransparent) 60% 100%) -420px 120px,
+      radial-gradient(var(--gradientColorTwo) 15%, var(--gradientColorTwoTransparent) 50% 100%) -620px 0,
+      radial-gradient(var(--gradientColorTwo) 25%, var(--gradientColorTwoTransparent) 50% 100%) 520px -250px, var(--gradientColorZero);
+    background-repeat: repeat-y;
+  }
+}
+.Gradient.isLoaded:after {
+  transition: transform 1s 1s;
+  transform: translateX(-50%) scaleY(0.995);
 }

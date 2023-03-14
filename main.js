@@ -12,7 +12,7 @@ export default class Gradient {
       density: [0.6, 0.16],
       darkenTop: false,
       activeColors: [1, 1, 1, 1],
-      noiseFreq: [14e-4, 29e-4],
+      noiseFreq: [0.00014, 0.00029],
       noiseSpeed: 8.33,
       angle: 0,
       amp: 320,
@@ -22,7 +22,7 @@ export default class Gradient {
     this.container = options.dom;
     this.sectionColors = initGradientColors(this.container);
     this.width = this.container.offsetWidth;
-    this.height = this.container.offsetHeight;
+    this.height = 600;
     this.xSegCount = Math.ceil(this.width * this.conf.density[0]);
     this.ySegCount = Math.ceil(this.height * this.conf.density[1]);
     this.renderer = void 0;
@@ -56,6 +56,7 @@ export default class Gradient {
     this.onWindowResize();
     this.setupWindowResize();
     this.render();
+    this.addIsLoadedClass();
   }
 
   init() {
@@ -65,11 +66,9 @@ export default class Gradient {
       antialias: true
     });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.setSize(this.width, this.height);
     this.renderer.setClearColor(0xeeeeee, 1);
 
-    this.camera = new THREE.OrthographicCamera();
-    this.camera.projectionMatrix.fromArray([2 / this.width, 0, 0, 0, 0, 2 / this.height, 0, 0, 0, 0, 2 / (-2e3 - 2e3), 0, 0, 0, 0, 1]);
+    this.camera = new THREE.OrthographicCamera(this.width / -2, this.width / 2, this.height / 2, this.height / -2, -2000, 2000);
   }
 
   setupWindowResize() {
@@ -78,19 +77,24 @@ export default class Gradient {
 
   onWindowResize() {
     this.width = this.container.offsetWidth;
-    this.height = this.container.offsetHeight;
-    this.xSegCount = Math.ceil(this.width * 0.06);
-    this.ySegCount = Math.ceil(this.height * 0.16);
-
-    this.camera.aspect = this.width / this.height;
-
-    this.renderer.setSize(this.width, this.height);
+    this.container.width = this.width;
+    this.renderer.setViewport(0, 0, this.width, this.height);
+    this.uniforms.resolution.value = [this.width, this.height];
+    this.camera.updateProjectionMatrix();
+    this.xSegCount = Math.ceil(this.width * this.conf.density[0]);
+    this.ySegCount = Math.ceil(this.height * this.conf.density[1]);
+    this.mesh.geometry.parameters = {
+      width: this.width,
+      height: this.height,
+      widthSegments: this.xSegCount,
+      heightSegments: this.ySegCount
+    };
+    this.mesh.material.uniforms.u_shadow_power.value = this.width < 600 ? 5 : 6;
   }
 
   initMaterial() {
     this.uniforms = {
-      aspectRatio: { value: this.camera.aspect },
-      resolution: { value: [this.width, this.length] },
+      resolution: { value: [this.width, this.height] },
       u_time: { value: 0 },
       u_shadow_power: { value: this.width < 600 ? 5 : 6 },
       u_darken_top: { value: '' === this.conf.darkenTop ? 1 : 0 },
@@ -137,6 +141,8 @@ export default class Gradient {
     let gradient = this;
     this.initMaterial();
     this.material = new THREE.ShaderMaterial({
+      extensions: { derivatives: '#extension GL_OES_standard_derivatives : enable' },
+      side: THREE.DoubleSide,
       uniforms: this.uniforms,
       wireframe: this.conf.wireframe,
       vertexShader: vertexShader,
@@ -144,6 +150,15 @@ export default class Gradient {
     });
 
     this.geometry = new THREE.PlaneGeometry(this.width, this.height, this.xSegCount, this.ySegCount);
+    this.uvNorm = new THREE.Float32BufferAttribute(this.geometry.attributes.uv.array, 2);
+    for (let e = 0; e <= this.ySegCount; e++) {
+      for (let t = 0; t <= this.xSegCount; t++) {
+        const i = e * (this.xSegCount + 1) + t;
+        this.uvNorm.array[2 * i] = (t / this.xSegCount) * 2 - 1;
+        this.uvNorm.array[2 * i + 1] = 1 - (e / this.ySegCount) * 2;
+      }
+    }
+    this.geometry.setAttribute('uvNorm', this.uvNorm);
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
 
@@ -172,6 +187,13 @@ export default class Gradient {
       }
     }
     requestAnimationFrame(this.render.bind(this));
+  }
+
+  addIsLoadedClass() {
+    this.container.classList.add('isLoaded');
+    setTimeout(() => {
+      this.container.classList.add('isLoaded');
+    }, 3e3);
   }
 }
 
