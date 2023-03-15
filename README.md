@@ -20,17 +20,13 @@ Clone this repo and then in command line type:
 
 **CSS**
 
-```css
-.gradient-canvas {
-  margin: 0;
-  padding: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
+```css Color Pallete for Blending
+.HomepageHeroGradient {
   --gradientColorZero: #a960ee;
   --gradientColorOne: #ff333d;
   --gradientColorTwo: #90e0ff;
   --gradientColorThree: #ffcb57;
+  ...;
 }
 ```
 

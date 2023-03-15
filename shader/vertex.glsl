@@ -49,14 +49,10 @@ void main() {
   float time = u_time * u_global.noiseSpeed;
   vec2 noiseCoord = resolution * uvNorm * u_global.noiseFreq;
 
-  vec2 st = 1. - uvNorm.xy;
-
-  // Tilt
   float tilt = resolution.y / 2.0 * uvNorm.y;
   float incline = resolution.x * uvNorm.x / 2.0 * u_vertDeform.incline;
   float offset = resolution.x / 2.0 * u_vertDeform.incline * mix(u_vertDeform.offsetBottom, u_vertDeform.offsetTop, uv.y);
 
-  // Vertex noise
   float noise = snoise(vec3(
     noiseCoord.x * u_vertDeform.noiseFreq.x + time * u_vertDeform.noiseFlow,
     noiseCoord.y * u_vertDeform.noiseFreq.y,
@@ -81,7 +77,7 @@ void main() {
       v_color = u_baseColor;
   }
 
-  for (int i = 0; i <= u_waveLayers_length; i++) {
+  for (int i = 0; i < u_waveLayers_length; i++) {
       if (u_active_colors[i + 1] == 1.) {
         WaveLayers layer = u_waveLayers[i];
 
@@ -89,8 +85,8 @@ void main() {
         layer.noiseFloor,
         layer.noiseCeil,
         snoise(vec3(
-          uv.x * layer.noiseFreq.x + time * layer.noiseFlow,
-          uv.y * layer.noiseFreq.y,
+            noiseCoord.x * layer.noiseFreq.x + time * layer.noiseFlow,
+          noiseCoord.y * layer.noiseFreq.y,
           time * layer.noiseSpeed + layer.noiseSeed
         )) / 2.0 + 0.5
       );
@@ -100,5 +96,6 @@ void main() {
   }
 
   // Finish
+
   gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
 }

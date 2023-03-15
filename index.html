@@ -5,6 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/DGLogo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stripe Gradient</title>
+    <link rel="stylesheet" href="/style.css" />
   </head>
   <body>
     <div>
@@ -18,6 +19,9 @@
                     <h1 class="HomepageHeroHeader__title" data-js-target-list="HomepageHeroHeader.title">Financial infrastructure for the internet</h1>
                     <div class="HomepageHeroGradient Gradient isLoaded">
                       <canvas class="gradient-canvas" data-js-controller="Gradient"></canvas>
+                    </div>
+                    <div class="HomepageHeroHeader__title HomepageHeroHeader__title--overlay HomepageHeroHeader__title--burn" data-js-target-list="HomepageHeroHeader.title" aria-hidden="true">
+                      Financial infrastructure for the internet
                     </div>
                     <div class="HomepageHeroHeader__title HomepageHeroHeader__title--overlay" data-js-target-list="HomepageHeroHeader.title" aria-hidden="true">
                       Financial infrastructure for the internet
@@ -33,7 +37,6 @@
         </div>
       </section>
     </div>
-
-    <script type="module" src="/main.js"></script>
+    <script type="module" src="/Gradient.js"></script>
   </body>
 </html>
